@@ -476,57 +476,58 @@ view : UserState -> Model -> Html Message
 view userState model =
     Html.div
         (id "page-including-top-bar" :: Views.Styles.pageIncludingTopBar)
-        [ Html.div
-            (id "top-bar-app" :: Views.Styles.topBar False)
-          <|
-            [ Html.div [ style "display" "flex" ]
-                [ hamburgerMenu model
-                , Html.a (href "/" :: Styles.concourseLogo) []
-                ]
-            ]
-                ++ (let
-                        isDropDownHidden =
-                            model.dropdown == Hidden
-
-                        isMobile =
-                            model.screenSize == ScreenSize.Mobile
-                    in
-                    if
-                        not model.highDensity
-                            && isMobile
-                            && (not isDropDownHidden || model.query /= "")
-                    then
-                        [ SearchBar.view model ]
-
-                    else if not model.highDensity then
-                        [ SearchBar.view model
-                        , Login.view userState model False
-                        ]
-
-                    else
-                        [ Login.view userState model False ]
-                   )
+        [ topBar userState model
         , Html.div
             (id "page-below-top-bar"
-                :: Styles.pageBelowTopBar model
+                :: Views.Styles.pageBelowTopBar
+                    (Routes.Dashboard <| Routes.Normal Nothing)
             )
           <|
             if model.sideBarOpen then
-                [ sideBar model
-                , Html.div
-                    [ style "box-sizing" "border-box"
-                    , style "display" "flex"
-                    , style "padding-bottom" "50px"
-                    , style "height" "100%"
-                    , style "width" "100%"
-                    , style "overflow-y" "auto"
-                    ]
-                    (dashboardView model)
+                [ Html.div
+                    Styles.sideBar
+                    (model.groups |> List.map sideBarPipelineGroup)
+                , dashboardView model
                 ]
 
             else
-                dashboardView model
+                [ dashboardView model ]
+        , Footer.view model
         ]
+
+
+topBar : UserState -> Model -> Html Message
+topBar userState model =
+    Html.div
+        (id "top-bar-app" :: Views.Styles.topBar False)
+    <|
+        [ Html.div [ style "display" "flex" ]
+            [ hamburgerMenu model
+            , Html.a (href "/" :: Styles.concourseLogo) []
+            ]
+        ]
+            ++ (let
+                    isDropDownHidden =
+                        model.dropdown == Hidden
+
+                    isMobile =
+                        model.screenSize == ScreenSize.Mobile
+                in
+                if
+                    not model.highDensity
+                        && isMobile
+                        && (not isDropDownHidden || model.query /= "")
+                then
+                    [ SearchBar.view model ]
+
+                else if not model.highDensity then
+                    [ SearchBar.view model
+                    , Login.view userState model False
+                    ]
+
+                else
+                    [ Login.view userState model False ]
+               )
 
 
 hamburgerMenu : Model -> Html Message
@@ -546,17 +547,6 @@ hamburgerMenu model =
                     { clicked = model.sideBarOpen
                     , hovered = model.hovered == Just HamburgerMenu
                     }
-
-
-sideBar : Model -> Html Message
-sideBar model =
-    Html.div
-        [ style "border-top" <| "1px solid " ++ Colors.background
-        , style "background-color" Colors.frame
-        , style "max-width" "38%"
-        , style "overflow-y" "auto"
-        ]
-        (model.groups |> List.map sideBarPipelineGroup)
 
 
 sideBarPipelineGroup : Group -> Html Message
@@ -600,24 +590,24 @@ sideBarPipelineGroup g =
         ]
 
 
-dashboardView : Model -> List (Html Message)
+dashboardView : Model -> Html Message
 dashboardView model =
     case model.state of
         RemoteData.NotAsked ->
-            [ Html.text "" ]
+            Html.text ""
 
         RemoteData.Loading ->
-            [ Html.text "" ]
+            Html.text ""
 
         RemoteData.Failure (Turbulence path) ->
-            [ turbulenceView path ]
+            turbulenceView path
 
         RemoteData.Success substate ->
-            [ Html.div
+            Html.div
                 (class (.pageBodyClass Message.Effects.stickyHeaderConfig)
                     :: Styles.content model.highDensity
                 )
-              <|
+            <|
                 welcomeCard model
                     :: pipelinesView
                         { groups = model.groups
@@ -629,8 +619,6 @@ dashboardView model =
                         , userState = model.userState
                         , highDensity = model.highDensity
                         }
-            , Footer.view model
-            ]
 
 
 welcomeCard :

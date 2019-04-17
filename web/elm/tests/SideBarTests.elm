@@ -82,11 +82,6 @@ all =
                     >> given iClickedTheHamburgerIcon
                     >> when iAmLookingAtThePageBelowTheTopBar
                     >> then_ iSeeTwoChildren
-            , test "page below top bar has no bottom padding" <|
-                given iAmViewingTheDashboardOnANonPhoneScreen
-                    >> given iClickedTheHamburgerIcon
-                    >> when iAmLookingAtThePageBelowTheTopBar
-                    >> then_ iSeeNoBottomPadding
             , test "sidebar and page contents are side by side" <|
                 given iAmViewingTheDashboardOnANonPhoneScreen
                     >> given iClickedTheHamburgerIcon
@@ -471,10 +466,6 @@ iSeeARightPointingChevronArrow =
             , image = "baseline-chevron-right-24px.svg"
             }
         )
-
-
-iSeeNoBottomPadding =
-    Query.has [ style "padding-bottom" "0" ]
 
 
 iAmLookingAtTheTeamName =

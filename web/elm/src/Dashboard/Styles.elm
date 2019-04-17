@@ -20,7 +20,6 @@ module Dashboard.Styles exposing
     , noPipelineCardHeader
     , noPipelineCardTextHd
     , noResults
-    , pageBelowTopBar
     , pipelineCard
     , pipelineCardBanner
     , pipelineCardBannerHd
@@ -38,6 +37,7 @@ module Dashboard.Styles exposing
     , searchContainer
     , searchInput
     , showSearchContainer
+    , sideBar
     , striped
     , teamNameHd
     , topCliIcon
@@ -75,6 +75,17 @@ content highDensity =
         else
             "0"
     , style "flex-grow" "1"
+    , style "overflow-y" "auto"
+    , style "height" "100%"
+    , style "width" "100%"
+    , style "box-sizing" "border-box"
+    , style "padding-bottom" "50px"
+    , style "flex-direction" <|
+        if highDensity then
+            "column"
+
+        else
+            "row"
     ]
 
 
@@ -719,16 +730,10 @@ concourseLogo =
         :: Views.Styles.concourseLogo
 
 
-pageBelowTopBar : { a | sideBarOpen : Bool } -> List (Html.Attribute msg)
-pageBelowTopBar { sideBarOpen } =
-    [ style "box-sizing" "border-box"
-    , style "display" "flex"
-    , style "height" "100%"
-    , style "padding-top" "54px"
-    , style "padding-bottom" <|
-        if sideBarOpen then
-            "0"
-
-        else
-            "50px"
+sideBar : List (Html.Attribute msg)
+sideBar =
+    [ style "border-top" <| "1px solid " ++ Colors.background
+    , style "background-color" Colors.frame
+    , style "max-width" "38%"
+    , style "overflow-y" "auto"
     ]
